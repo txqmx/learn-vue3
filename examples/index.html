@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="../node_modules/@vue/reactivity/dist/reactivity.global.js"></script>
+<div id="app"></div>
+<script>
+  const {reactive, effect} = VueReactivity
+  let obj = {name: 'liu', age: 12, address:{num:504}}
+  let r1 = reactive(obj)
+
+  effect(() => { // watchApi computed 组件渲染 都是基于effect函数
+      app.innerHTML = r1.name
+  })
+  setTimeout(() => {
+      r1.name = 'si'
+  }, 1000)
+
+
+</script>
+</body>
+</html>

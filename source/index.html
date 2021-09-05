@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app"></div>
+<script src="./node_modules/@vue/reactivity/dist/reactivity.global.js"></script>
+<script>
+    const {reactive, effect, readonly, shallowReactive, shallowReadonly} = VueReactivity
+
+    // vue2中的响应式是不能自己控制的，vue3给了一个api 可以自动转换响应式
+    // vue2响应式原理，数据变化要重新执行watcher，更新视图，观察者模式"类"
+    // vue 响应式使用的是proxy -》数据更新了。通知effect
+
+    let state = reactive({name: 'liu', age:12, a:[1,2,3]}) // 递归代理
+    console.log(state.a);
+
+    let state1 = shallowReactive({name: 'liu', age:12, a:[1,2,3]}) // 只代理一层
+    console.log(state1.a);
+
+    let state2 = readonly({name: 'si', age:13}) // 只读
+    console.log(state2);
+
+    let state3 = shallowReadonly({name: 'si', age:13}) // 只读
+    console.log(state3);
+
+    // 我们给对象添加响应式的时候最常用的是reactive
+
+    effect(() => { // 副作用函数,默认会先执行一次，如果依赖的数据发生了变化，会再次执行
+        app.innerHTML = state.name + state.age
+    })
+
+    // effect api是@vue/reactivity 模块里的，vue3 里面不能直接使用effect
+
+    setTimeout(()=> {
+        state.age = 13
+    }, 1000)
+</script>
+</body>
+</html>
