@@ -10,14 +10,16 @@ var VueShared = (function (exports) {
 	const extend = Object.assign;
 	// 判断属性是不是原型属性
 	const hasOwn = (target, key) => Object.prototype.hasOwnProperty.call(target, key);
-	const hasChange = (oldValue, value) => oldValue !== value;
+	const hasChanged = (oldValue, value) => oldValue !== value;
+	const isInteger = (key) => parseInt(key) + '' === key + '';
 
 	exports.extend = extend;
-	exports.hasChange = hasChange;
+	exports.hasChanged = hasChanged;
 	exports.hasOwn = hasOwn;
 	exports.isArray = isArray;
 	exports.isBoolean = isBoolean;
 	exports.isFunction = isFunction;
+	exports.isInteger = isInteger;
 	exports.isNumber = isNumber;
 	exports.isObject = isObject;
 	exports.isString = isString;

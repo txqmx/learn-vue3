@@ -9,4 +9,6 @@ export const extend = Object.assign
 // 判断属性是不是原型属性
 export const hasOwn = (target, key) => Object.prototype.hasOwnProperty.call(target, key)
 
-export const hasChange = (oldValue, value) => oldValue !== value
+export const hasChanged = (oldValue, value) => oldValue !== value
+
+export const isInteger = (key) => parseInt(key) + '' === key + ''

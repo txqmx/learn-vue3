@@ -1,7 +1,7 @@
 // 核心进行劫持的方法，处理get和set逻辑
 
 import {reactive, readonly} from "./reactive";
-import {extend, isObject} from "@vue/shared";
+import {extend, hasChanged, hasOwn, isArray, isInteger, isObject} from "@vue/shared";
 import {track, trigger} from "./effect";
 
 const get = createGetter()
@@ -24,7 +24,6 @@ function createGetter(isReadonly = false, shallow = false){
 
         if(!isReadonly){ // 如果对象是一个仅读的属性，意味着这个对象不可能被更改，不用依赖收集
             // 依赖收集
-            console.log('依赖收集');
             // 如果当前是在effect中取值，要做一个映射关系 obj.name -> [effect,effect]
             // let dep = new Dep() dep.depend()
             track(target, 'get', key)
@@ -45,10 +44,19 @@ function createGetter(isReadonly = false, shallow = false){
 
 function createSetter(){
     return function set(target, key, value, receiver){
-        let res = Reflect.set(target, key, value, receiver) // target[key] = value
+        let oldValue = target[key]
+
+        // 如果是新增也要触发更新
+        let hadKey = isArray(target) && isInteger(key) ? key < target.length : hasOwn(target, key)
+
         // 触发视图更新
-        trigger(target, key, value) // 触发这个对象上的属性，让他更新
-        console.log('视图更新');
+        let res = Reflect.set(target, key, value, receiver) // target[key] = value
+
+        if(!hadKey){ // 新增逻辑
+            trigger(target, key, value, 'add')
+        }else if(hasChanged(oldValue, value)){
+            trigger(target, key, value, 'set') // 触发这个对象上的属性，让他更新
+        }
         return res
     }
 }

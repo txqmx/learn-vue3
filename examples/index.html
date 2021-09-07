@@ -9,14 +9,22 @@
 <div id="app"></div>
 <script>
   const {reactive, effect} = VueReactivity
-  let obj = {name: 'liu', age: 12, address:{num:504}}
+  let obj = {name: 'liu', age: 12, address:{num:504}, arr: [1,2,3,4]}
   let r1 = reactive(obj)
 
   effect(() => { // watchApi computed 组件渲染 都是基于effect函数
-      app.innerHTML = r1.name
+      // app.innerHTML = r1.name
+      // console.log(r1.arr[3]);
+      console.log(JSON.stringify(r1.arr));
   })
   setTimeout(() => {
-      r1.name = 'si'
+      // r1.name = 'si'
+      // r1.arr[0] = 100
+      // r1.arr.length = 1
+
+      // 调用push会在数组中添加一项，并且直接将数组length + 1
+      // 之后再次触发set方法 拿到老的length 已经是+1后的，值不会发生变化
+      r1.arr.push(5)
   }, 1000)
 
 

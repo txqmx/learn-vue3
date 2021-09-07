@@ -7,6 +7,7 @@ const isArray = Array.isArray;
 const extend = Object.assign;
 // 判断属性是不是原型属性
 const hasOwn = (target, key) => Object.prototype.hasOwnProperty.call(target, key);
-const hasChange = (oldValue, value) => oldValue !== value;
+const hasChanged = (oldValue, value) => oldValue !== value;
+const isInteger = (key) => parseInt(key) + '' === key + '';
 
-export { extend, hasChange, hasOwn, isArray, isBoolean, isFunction, isNumber, isObject, isString };
+export { extend, hasChanged, hasOwn, isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString };
