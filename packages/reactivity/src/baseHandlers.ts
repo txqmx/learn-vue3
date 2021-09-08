@@ -45,7 +45,6 @@ function createGetter(isReadonly = false, shallow = false){
 function createSetter(){
     return function set(target, key, value, receiver){
         let oldValue = target[key]
-
         // 如果是新增也要触发更新
         let hadKey = isArray(target) && isInteger(key) ? key < target.length : hasOwn(target, key)
 

@@ -84,13 +84,23 @@ function trigger(target, key, value, type) {
             if (isArray(target) && isInteger(key)) {
                 add(depsMap.get('length'));
             }
+            else { // 对象新增逻辑
+                add(depsMap.get(key));
+            }
         }
         else {
             const effects = depsMap.get(key); // 找到此属性对应的effect列表，直接执行
             add(effects);
         }
     }
-    effectsQueue.forEach((effect) => effect());
+    effectsQueue.forEach((effect) => {
+        if (effect.options.scheduler) {
+            effect.options.scheduler(effect);
+        }
+        else {
+            effect();
+        }
+    });
 }
 
 // 核心进行劫持的方法，处理get和set逻辑
@@ -187,8 +197,60 @@ function createReactiveObject(target, baseHandlers, proxyMap) {
     return proxy;
 }
 
+function ref(value) {
+    return createRef(value);
+}
+function shallowRef(value) {
+    return createRef(value, true);
+}
+const convert = val => isObject(val) ? reactive(val) : val;
+class RefImpl {
+    rewValue;
+    isShallow;
+    _value;
+    constructor(rewValue, isShallow) {
+        this.rewValue = rewValue;
+        this.isShallow = isShallow;
+        this._value = isShallow ? rewValue : convert(rewValue); // this._value 就是一个私有属性
+    }
+    get value() {
+        track(this, 'get', 'value');
+        return this._value;
+    }
+    set value(newValue) {
+        if (hasChanged(newValue, this.rewValue)) {
+            this.rewValue = newValue; // 属性变化， 需要更新
+            this._value = this.isShallow ? newValue : convert(newValue);
+            trigger(this, 'value', newValue, 'set');
+        }
+    }
+}
+function createRef(value, isShallow = false) {
+    return new RefImpl(value, isShallow);
+}
+class ObjectRefImpl {
+    target;
+    key;
+    constructor(target, key) {
+        this.target = target;
+        this.key = key;
+    }
+    get value() {
+        return this.target[this.key];
+    }
+    set value(newValue) {
+        this.target[this.key] = newValue;
+    }
+}
+function toRef(target, key) {
+    return new ObjectRefImpl(target, key);
+}
+
 exports.effect = effect;
 exports.reactive = reactive;
 exports.readonly = readonly;
+exports.ref = ref;
 exports.shallowReactive = shallowReactive;
 exports.shallowReadonly = shallowReadonly;
+exports.shallowRef = shallowRef;
+exports.toRef = toRef;

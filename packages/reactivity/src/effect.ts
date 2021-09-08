@@ -78,6 +78,8 @@ export function trigger(target, key, value, type){
         if(type === 'add'){ // 表示辛新增逻辑，触发更新 触发length更新
             if(isArray(target) && isInteger(key)){
                 add( depsMap.get('length'))
+            } else { // 对象新增逻辑
+                add(depsMap.get(key))
             }
         } else {
             const effects = depsMap.get(key) // 找到此属性对应的effect列表，直接执行
